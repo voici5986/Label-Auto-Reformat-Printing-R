@@ -5,6 +5,8 @@ import { ControlPanel } from "./components/ControlPanel";
 import { PreviewPanel } from "./components/PreviewPanel";
 import type { HelperLayoutConfig } from "./utils/layoutMath";
 import { generatePDF } from "./utils/pdfGenerator";
+import { Toast, type ToastType } from "./components/Toast";
+import { useI18n } from "./utils/i18n";
 
 // Default Config
 const DEFAULT_CONFIG: HelperLayoutConfig = {
@@ -16,6 +18,8 @@ const DEFAULT_CONFIG: HelperLayoutConfig = {
 };
 
 function App() {
+  const { t } = useI18n(); // Helper to access translations if needed, though most UI in subcomponents
+
   // State
   const [config, setConfig] = useState<HelperLayoutConfig>(() => {
     // Load from localStorage
@@ -25,6 +29,21 @@ function App() {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
+
+  // Toast State
+  const [toast, setToast] = useState<{ message: string; type: ToastType; visible: boolean }>({
+    message: "",
+    type: "success",
+    visible: false
+  });
+
+  const showToast = (message: string, type: ToastType) => {
+    setToast({ message, type, visible: true });
+  };
+
+  const closeToast = () => {
+    setToast(prev => ({ ...prev, visible: false }));
+  };
 
   // Persist Config
   useEffect(() => {
@@ -45,8 +64,9 @@ function App() {
     if (!imageFile) return;
     try {
       await generatePDF(config, imageFile);
+      showToast(t('gen_success'), 'success');
     } catch (e) {
-      alert("Failed to generate PDF: " + (e as Error).message);
+      showToast(t('gen_failed') + ": " + (e as Error).message, 'error');
     }
   };
 
@@ -66,6 +86,14 @@ function App() {
           imageFile={imageFile}
         />
       </main>
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.visible}
+        onClose={closeToast}
+      />
     </Layout>
   );
 }

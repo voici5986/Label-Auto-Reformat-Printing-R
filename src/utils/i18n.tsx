@@ -28,6 +28,8 @@ export const translations = {
     error_title: '错误',
     no_file: '请先选择文件',
     generating: '生成中...',
+    gen_success: 'PDF 生成成功！正在开始下载...',
+    gen_failed: '生成 PDF 失败',
   },
   th: {
     window_title: 'เครื่องมือจัดเรียงฉลาก',
@@ -47,12 +49,14 @@ export const translations = {
     portrait: 'แนวตั้ง',
     landscape: 'แนวนอน',
     generate_btn: 'สร้างไฟล์ PDF',
-    preview_hint: 'โหมดตัวอย่าง',
+    preview_hint: 'โหมดดูตัวอย่าง • ไม่ใช่อัตราส่วนจริง',
     zoom_reset: 'รีเซ็ตการซูม',
     success_title: 'สำเร็จ',
     error_title: 'ข้อผิดพลาด',
     no_file: 'กรุณาเลือกไฟล์',
     generating: 'กำลังสร้าง...',
+    gen_success: 'สร้างไฟล์ PDF สำเร็จ! กำลังดาวน์โหลด...',
+    gen_failed: 'ล้มเหลวในการสร้าง PDF',
   }
 };
 
