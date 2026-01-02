@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# Label Printer Utility (Web Version)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-7.0-646CFF?style=flat-square&logo=vite)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=flat-square&logo=tailwind-css)
 
-Currently, two official plugins are available:
+**English** | [简体中文](./README.zh-CN.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A modern, offline-capable web application for batch generating label PDF documents from images. Rebuilt from the ground up using React 19 to replace the legacy PyQt6 desktop application.
 
-## React Compiler
+## ✨ Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **🚀 Pure Client-Side**: Generates print-ready A4 PDFs directly in your browser using `jspdf`. No data is uploaded to any server.
+- **🎨 Modern UX**: Glassmorphism design system powered by Tailwind CSS v4 and Framer Motion animations.
+- **🌍 Internationalization**: Built-in support for **Chinese (Simplified)** and **Thai**, with instant language switching.
+- **👁️ Real-time Preview**: What you see is what you get. Vizualize your layout on a virtual A4 canvas before generating.
+- **📐 Flexible Layout**:
+  - Customizable Rows & Columns (Default 3x3)
+  - Adjustable Margins & Spacing (mm precision)
+  - Portrait & Landscape orientation support
+- **🖼️ Smart Image Scaling**: Automatically scales and centers images to fit label slots without distortion (Aspect Ratio Preserved).
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: React 19.2.3 (Latest Stable)
+- **Build Tool**: Vite 7.3
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4.1, Lucide React (Icons)
+- **PDF Engine**: jsPDF
+- **Animation**: Framer Motion
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js (v18 or higher recommended)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/label-react.git
+   cd label-react
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your browser.
+
+## 📦 Building for Production
+
+To create a production-ready build (static files):
+
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The output will be in the `dist/` directory. You can drop these files into any static hosting service (Vercel, Netlify, GitHub Pages, or Nginx).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 💡 Usage Guide
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Upload Source**: Click the upload area to select your label image (JPG/PNG).
+2. **Configure Layout**: Use the left sidebar to adjust rows, columns, and spacing.
+3. **Check Preview**: Verify the layout on the right preview panel.
+4. **Generate**: Click "Generate PDF" to download the final file.
+
+## 📄 License
+
+MIT License.
