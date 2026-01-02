@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { calculateLabelLayout, A4_WIDTH_MM, A4_HEIGHT_MM } from "../utils/layoutMath";
 import type { HelperLayoutConfig } from "../utils/layoutMath";
-import { Minus, Plus, Maximize, Printer } from "lucide-react";
+import { Minus, Plus, Maximize } from "lucide-react";
 import { useI18n } from "../utils/i18n";
 
 interface PreviewPanelProps {
@@ -36,7 +36,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
     // Base pixel scale (mm to px for preview) - approximate 3.78 px/mm (96 dpi) or more for high res
     // We'll use CSS scale for zooming, but base size should be readable. 
     // Let's assume 1mm = 3px for base render to keep it sharp enough.
-    const MM_TO_PX = 3;
+    // const MM_TO_PX = 3; // Unused
 
     const paperStyle = {
         width: `${paperWidthMm}mm`,
