@@ -106,17 +106,31 @@ export function ControlPanel({
                     <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                         <Layout className="w-4 h-4" /> {t('orientation')}
                     </h2>
-                    <div className="bg-slate-100/50 p-1 rounded-xl flex border border-slate-200">
+                    <div className="bg-slate-100/50 p-1 rounded-xl flex border border-slate-200 relative isolate">
                         <button
                             onClick={() => onConfigChange({ orientation: 'portrait' })}
-                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all ${config.orientation === 'portrait' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors relative z-0 ${config.orientation === 'portrait' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
+                            {config.orientation === 'portrait' && (
+                                <motion.div
+                                    layoutId="orientation-active"
+                                    className="absolute inset-0 bg-white shadow-sm rounded-lg -z-10"
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
+                            )}
                             <FileIcon className="w-4 h-4" /> {t('portrait')}
                         </button>
                         <button
                             onClick={() => onConfigChange({ orientation: 'landscape' })}
-                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all ${config.orientation === 'landscape' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors relative z-0 ${config.orientation === 'landscape' ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
+                            {config.orientation === 'landscape' && (
+                                <motion.div
+                                    layoutId="orientation-active"
+                                    className="absolute inset-0 bg-white shadow-sm rounded-lg -z-10"
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
+                            )}
                             <FileMinus className="w-4 h-4 transform rotate-90" /> {t('landscape')}
                         </button>
                     </div>
@@ -125,16 +139,41 @@ export function ControlPanel({
             </div>
 
             {/* Action Button */}
-            <div className="p-6 border-t border-white/50 bg-white/40 backdrop-blur-sm rounded-b-2xl">
+            <div className="p-6 border-t border-white/50 bg-white/40 backdrop-blur-sm rounded-b-2xl overflow-hidden relative">
+                {/* Shine effect container */}
+                <motion.div
+                    className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                    initial={false}
+                    animate={selectedFileName ? { x: "100%" } : { x: "-100%" }}
+                    transition={{ duration: 0.5 }}
+                />
+
                 <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    layout
+                    whileHover={selectedFileName ? { scale: 1.02, boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.4)" } : {}}
+                    whileTap={selectedFileName ? { scale: 0.98 } : {}}
+                    initial={false}
+                    animate={selectedFileName ? {
+                        opacity: 1,
+                        scale: 1,
+                        filter: "grayscale(0%)",
+                        boxShadow: "0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06)"
+                    } : {
+                        opacity: 0.7,
+                        scale: 1,
+                        filter: "grayscale(100%)",
+                        boxShadow: "none"
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     onClick={onGeneratePdf}
                     disabled={!selectedFileName}
-                    className={`w-full py-3.5 px-4 rounded-xl font-semibold text-sm shadow-lg flex items-center justify-center gap-2 transition-all ${selectedFileName ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-indigo-500/30' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                    className={`w-full py-3.5 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 relative overflow-hidden group ${selectedFileName ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
                 >
+                    {/* Shimmer overlay on hover */}
+                    <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+
                     <Download className="w-5 h-5" />
-                    {t('generate_btn')}
+                    <span>{t('generate_btn')}</span>
                 </motion.button>
             </div>
         </aside>

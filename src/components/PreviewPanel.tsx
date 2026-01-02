@@ -40,9 +40,6 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
     // const MM_TO_PX = 3; // Unused
 
     const paperStyle = {
-        width: `${paperWidthMm}mm`,
-        height: `${paperHeightMm}mm`,
-        scale, // Use motion style scale instead of transform
         transformOrigin: 'top center',
     } as any;
 
@@ -57,7 +54,13 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                 <div className="flex-1 overflow-auto flex justify-center p-8 scrollbar-thin scrollbar-thumb-slate-300">
                     <motion.div
                         layout
-                        transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                        initial={false}
+                        animate={{
+                            width: `${paperWidthMm}mm`,
+                            height: `${paperHeightMm}mm`,
+                            scale: scale
+                        }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
                         className="bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] relative"
                         style={paperStyle}
                     >
