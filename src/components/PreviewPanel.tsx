@@ -3,6 +3,7 @@ import { calculateLabelLayout, A4_WIDTH_MM, A4_HEIGHT_MM } from "../utils/layout
 import type { HelperLayoutConfig } from "../utils/layoutMath";
 import { Minus, Plus, Maximize } from "lucide-react";
 import { useI18n } from "../utils/i18n";
+import { motion } from "framer-motion";
 
 interface PreviewPanelProps {
     config: HelperLayoutConfig;
@@ -41,9 +42,9 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
     const paperStyle = {
         width: `${paperWidthMm}mm`,
         height: `${paperHeightMm}mm`,
-        transform: `scale(${scale})`,
-        transformOrigin: 'center top', // Zoom from top center
-    };
+        scale, // Use motion style scale instead of transform
+        transformOrigin: 'top center',
+    } as any;
 
     return (
         <section className="flex-1 flex flex-col p-2 pl-0 h-full overflow-hidden">
@@ -54,8 +55,10 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
 
                 {/* Scrollable Area */}
                 <div className="flex-1 overflow-auto flex justify-center p-8 scrollbar-thin scrollbar-thumb-slate-300">
-                    <div
-                        className="bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] transition-all ease-out duration-300 relative"
+                    <motion.div
+                        layout
+                        transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                        className="bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] relative"
                         style={paperStyle}
                     >
                         {/* Render Labels */}
@@ -81,37 +84,37 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                         {/* Margins indicator (optional, maybe on hover) */}
                         {/* Watermark */}
                         <div className="absolute bottom-4 right-4 text-[10px] text-slate-300 pointer-events-none select-none">{t('preview_hint')}</div>
-                    </div>
+                    </motion.div>
                 </div>
-
-                {/* Zoom Controls */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/80 backdrop-blur rounded-full p-1.5 shadow-lg border border-white/50 z-20">
-                    <button
-                        onClick={() => setScale(s => Math.max(0.2, s - 0.1))}
-                        className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
-                    >
-                        <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="text-xs font-semibold text-slate-600 px-2 min-w-[3rem] text-center">
-                        {Math.round(scale * 100)}%
-                    </span>
-                    <button
-                        onClick={() => setScale(s => Math.min(3, s + 0.1))}
-                        className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
-                    >
-                        <Plus className="w-4 h-4" />
-                    </button>
-                    <div className="w-px h-4 bg-slate-300 mx-1"></div>
-                    <button
-                        onClick={() => setScale(1)}
-                        className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors tooltip"
-                        title={t('zoom_reset')}
-                    >
-                        <Maximize className="w-4 h-4" />
-                    </button>
-                </div>
-
             </div>
+
+            {/* Zoom Controls */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/80 backdrop-blur rounded-full p-1.5 shadow-lg border border-white/50 z-20">
+                <button
+                    onClick={() => setScale(s => Math.max(0.2, s - 0.1))}
+                    className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
+                >
+                    <Minus className="w-4 h-4" />
+                </button>
+                <span className="text-xs font-semibold text-slate-600 px-2 min-w-[3rem] text-center">
+                    {Math.round(scale * 100)}%
+                </span>
+                <button
+                    onClick={() => setScale(s => Math.min(3, s + 0.1))}
+                    className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors"
+                >
+                    <Plus className="w-4 h-4" />
+                </button>
+                <div className="w-px h-4 bg-slate-300 mx-1"></div>
+                <button
+                    onClick={() => setScale(1)}
+                    className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition-colors tooltip"
+                    title={t('zoom_reset')}
+                >
+                    <Maximize className="w-4 h-4" />
+                </button>
+            </div>
+
         </section>
     );
 }

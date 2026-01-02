@@ -33,7 +33,7 @@ export function ControlPanel({
 
                 {/* File Selection */}
                 <div className="space-y-3">
-                    <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                         <UploadCloud className="w-4 h-4" /> {t('file_group')}
                     </h2>
 
@@ -52,14 +52,14 @@ export function ControlPanel({
                             <p className="text-sm font-medium text-slate-700 truncate max-w-full px-2">
                                 {selectedFileName || t('browse_btn')}
                             </p>
-                            <p className="text-xs text-slate-400 mt-1">{t('browse_hint')}</p>
+                            <p className="text-sm text-slate-400 mt-1">{t('browse_hint')}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Grid Settings */}
                 <div className="space-y-4">
-                    <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                         <Grid className="w-4 h-4" /> {t('layout_group')}
                     </h2>
 
@@ -88,6 +88,7 @@ export function ControlPanel({
                             onChange={(v) => onConfigChange({ marginMm: v })}
                             min={0} max={50}
                             decimalPlaces={1}
+                            step={1}
                         />
                         <NumberInput
                             label={`${t('spacing')} (mm)`}
@@ -95,25 +96,26 @@ export function ControlPanel({
                             onChange={(v) => onConfigChange({ spacingMm: v })}
                             min={0} max={30}
                             decimalPlaces={1}
+                            step={1}
                         />
                     </div>
                 </div>
 
                 {/* Orientation */}
                 <div className="space-y-3">
-                    <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                         <Layout className="w-4 h-4" /> {t('orientation')}
                     </h2>
                     <div className="bg-slate-100/50 p-1 rounded-xl flex border border-slate-200">
                         <button
                             onClick={() => onConfigChange({ orientation: 'portrait' })}
-                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-all ${config.orientation === 'portrait' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all ${config.orientation === 'portrait' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             <FileIcon className="w-4 h-4" /> {t('portrait')}
                         </button>
                         <button
                             onClick={() => onConfigChange({ orientation: 'landscape' })}
-                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-all ${config.orientation === 'landscape' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            className={`flex-1 py-2 px-3 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all ${config.orientation === 'landscape' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                         >
                             <FileMinus className="w-4 h-4 transform rotate-90" /> {t('landscape')}
                         </button>
@@ -147,9 +149,10 @@ interface NumberInputProps {
     max: number;
     isInteger?: boolean;
     decimalPlaces?: number;
+    step?: number;
 }
 
-function NumberInput({ label, value, onChange, min, max, isInteger, decimalPlaces }: NumberInputProps) {
+function NumberInput({ label, value, onChange, min, max, isInteger, decimalPlaces, step: propsStep }: NumberInputProps) {
     // Local state to handle string input allowing intermediate states like "3."
     const [localVal, setLocalVal] = useState(String(value));
 
@@ -220,7 +223,7 @@ function NumberInput({ label, value, onChange, min, max, isInteger, decimalPlace
         onChange(num);
     };
 
-    const step = isInteger ? 1 : (decimalPlaces ? Math.pow(10, -decimalPlaces) : 1);
+    const step = propsStep ?? (isInteger ? 1 : (decimalPlaces ? Math.pow(10, -decimalPlaces) : 1));
 
     const increment = () => {
         const newVal = Math.min(max, value + step);
@@ -237,7 +240,7 @@ function NumberInput({ label, value, onChange, min, max, isInteger, decimalPlace
 
     return (
         <div className="space-y-1.5 hover:-translate-y-0.5 transition-transform duration-200">
-            <label className="text-xs font-medium text-slate-500 ml-1">{label}</label>
+            <label className="text-sm font-medium text-slate-500 ml-1">{label}</label>
             <div className="relative">
                 <input
                     type="text" // Use text to allow full control over validation

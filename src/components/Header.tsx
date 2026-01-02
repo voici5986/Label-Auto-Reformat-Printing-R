@@ -20,7 +20,7 @@ export function Header() {
                     <Printer className="w-5 h-5" />
                 </div>
                 <div>
-                    <h1 className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
+                    <h1 className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
                         {t('main_title')}
                     </h1>
                 </div>
@@ -32,7 +32,7 @@ export function Header() {
                     title="Switch Language"
                 >
                     <Globe className="w-5 h-5" />
-                    <span className="text-xs font-bold uppercase">{language}</span>
+                    <span className="text-sm font-bold uppercase">{language}</span>
                 </button>
                 <button className="text-slate-500 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-slate-100/50">
                     <HelpCircle className="w-5 h-5" />
