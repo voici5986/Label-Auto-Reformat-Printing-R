@@ -1,4 +1,4 @@
-# 标签打印排版工具 (Web 版)
+# LabelPilot (Web 版)
 
 ![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
@@ -13,7 +13,7 @@
 
 - **🚀 纯客户端运行**: 使用 `jspdf` 直接在浏览器中生成可打印的 A4 PDF。所有数据都在本地处理，不上传到任何服务器。
 - **🎨 现代 UX 设计**: 基于 Tailwind CSS v4 和 Framer Motion 动画的玻璃拟态设计风格。
-- **🌍 国际化支持**: 内置 **简体中文** 和 **泰语** 支持，可一键实时切换。
+- **🌍 国际化支持**: 内置 **英语** 和 **中文** 支持，可一键实时切换。
 - **👁️ 实时预览**: 所见即所得。在生成之前，可以在虚拟 A4 画布上可视化查看排版效果。
 - **📐 灵活排版**:
   - 主要参数：自定义行数和列数（默认 3x3）

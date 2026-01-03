@@ -6,7 +6,7 @@ export function Header() {
     const { t, language, setLanguage } = useI18n();
 
     const toggleLanguage = () => {
-        setLanguage(language === 'zh' ? 'th' : 'zh');
+        setLanguage(language === 'zh' ? 'en' : 'zh');
     };
 
     return (

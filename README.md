@@ -1,4 +1,4 @@
-# Label Printer Utility (Web Version)
+# LabelPilot (Web Version)
 
 ![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
@@ -13,7 +13,7 @@ A modern, offline-capable web application for batch generating label PDF documen
 
 - **🚀 Pure Client-Side**: Generates print-ready A4 PDFs directly in your browser using `jspdf`. No data is uploaded to any server.
 - **🎨 Modern UX**: Glassmorphism design system powered by Tailwind CSS v4 and Framer Motion animations.
-- **🌍 Internationalization**: Built-in support for **Chinese (Simplified)** and **Thai**, with instant language switching.
+- **🌍 Internationalization**: Built-in support for **English** and **Chinese**, with instant language switching.
 - **👁️ Real-time Preview**: What you see is what you get. Vizualize your layout on a virtual A4 canvas before generating.
 - **📐 Flexible Layout**:
   - Customizable Rows & Columns (Default 3x3)

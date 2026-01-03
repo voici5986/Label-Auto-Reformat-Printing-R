@@ -1,13 +1,32 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 
-export type Language = 'zh' | 'th';
+export type Language = 'en' | 'zh';
 
 export const translations = {
+  en: {
+    window_title: 'LabelPilot',
+    main_title: 'LabelPilot',
+    file_group: 'LABEL IMAGE',
+    layout_group: 'LAYOUT SETTINGS',
+    browse_btn: 'Click to upload image',
+    browse_hint: 'PNG, JPG supported',
+    rows: 'Rows',
+    cols: 'Columns',
+    margin: 'Margin',
+    spacing: 'Spacing',
+    orientation: 'Page Orientation',
+    portrait: 'Portrait',
+    landscape: 'Landscape',
+    generate_btn: 'Generate PDF',
+    zoom_reset: 'Reset Zoom',
+    gen_success: 'PDF Generated! Downloading...',
+    gen_failed: 'Failed to generate PDF',
+  },
   zh: {
-    window_title: '标签打印排版工具',
-    main_title: '标签批量打印工具',
-    file_group: '选择标签图片',
+    window_title: 'LabelPilot',
+    main_title: 'LabelPilot',
+    file_group: '标签图片',
     layout_group: '排版设置',
     browse_btn: '点击上传标签图片',
     browse_hint: '支持 PNG, JPG 格式',
@@ -20,27 +39,8 @@ export const translations = {
     landscape: '横向',
     generate_btn: '生成 PDF 文档',
     zoom_reset: '重置缩放',
-    gen_success: 'PDF 生成成功！正在开始下载...',
+    gen_success: 'PDF 已生成！正在开始下载...',
     gen_failed: '生成 PDF 失败',
-  },
-  th: {
-    window_title: 'เครื่องมือจัดเรียงฉลาก',
-    main_title: 'เครื่องมือพิมพ์ฉลาก',
-    file_group: 'เลือกรูปภาพฉลาก',
-    layout_group: 'ตั้งค่าการจัดวาง',
-    browse_btn: 'คลิกเพื่ออัปโหลดรูปภาพ',
-    browse_hint: 'รองรับไฟล์ PNG, JPG',
-    rows: 'แถว',
-    cols: 'คอลัมน์',
-    margin: 'ขอบ',
-    spacing: 'ระยะห่าง',
-    orientation: 'การวางแนว',
-    portrait: 'แนวตั้ง',
-    landscape: 'แนวนอน',
-    generate_btn: 'สร้างไฟล์ PDF',
-    zoom_reset: 'รีเซ็ตการซูม',
-    gen_success: 'สร้างไฟล์ PDF สำเร็จ! กำลังดาวน์โหลด...',
-    gen_failed: 'ล้มเหลวในการสร้าง PDF',
   }
 };
 
