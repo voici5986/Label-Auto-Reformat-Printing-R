@@ -1,13 +1,18 @@
+import { useState, useEffect } from "react";
 import { UploadCloud, Grid, Layout, File as FileIcon, FileMinus, Download } from "lucide-react";
 import type { HelperLayoutConfig } from "../utils/layoutMath";
 import { motion } from "framer-motion";
 import { useI18n } from "../utils/i18n";
 import { NumberInput } from "./NumberInput";
 
+import type { ImageItem } from "../App";
+
 interface ControlPanelProps {
     config: HelperLayoutConfig;
     onConfigChange: (updates: Partial<HelperLayoutConfig>) => void;
-    onFileSelect: (file: File) => void;
+    onFilesSelect: (files: File[]) => void;
+    imageItems: ImageItem[];
+    onItemCountChange: (id: string, count: number) => void;
     selectedFileName?: string;
     onGeneratePdf: () => void;
 }
@@ -15,15 +20,17 @@ interface ControlPanelProps {
 export function ControlPanel({
     config,
     onConfigChange,
-    onFileSelect,
+    onFilesSelect,
+    imageItems,
+    onItemCountChange,
     selectedFileName,
     onGeneratePdf
 }: ControlPanelProps) {
     const { t } = useI18n();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            onFileSelect(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            onFilesSelect(Array.from(e.target.files));
         }
     };
 
@@ -37,24 +44,38 @@ export function ControlPanel({
                         <UploadCloud className="w-4 h-4" /> {t('file_group')}
                     </h2>
 
-                    <div className="relative group cursor-pointer">
+                    <div className="relative group cursor-pointer transition-transform active:scale-[0.98]">
                         <input
                             type="file"
+                            multiple
                             accept="image/png, image/jpeg, image/jpg"
                             onChange={handleFileChange}
                             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                         />
                         <div className={`absolute inset-0 bg-indigo-50/50 rounded-lg border-2 border-dashed transition-colors ${selectedFileName ? 'border-brand-primary bg-indigo-50' : 'border-indigo-200 group-hover:border-indigo-400'}`}></div>
-                        <div className="relative flex flex-col items-center justify-center py-6 px-4 text-center pointer-events-none">
-                            <div className="bg-white p-3 rounded-full shadow-sm mb-3 group-hover:scale-115 transition-transform duration-300">
-                                <UploadCloud className={`w-6 h-6 ${selectedFileName ? 'text-brand-primary' : 'text-indigo-400'}`} />
+                        <div className="relative flex flex-col items-center justify-center py-5 px-4 text-center pointer-events-none">
+                            <div className="bg-white p-2.5 rounded-full shadow-sm mb-2 group-hover:scale-110 transition-transform duration-300">
+                                <UploadCloud className={`w-5 h-5 ${selectedFileName ? 'text-brand-primary' : 'text-indigo-400'}`} />
                             </div>
-                            <p className="text-sm font-medium text-slate-700 truncate max-w-full px-2">
+                            <p className="text-xs font-bold text-slate-700 truncate max-w-full px-2">
                                 {selectedFileName || t('browse_btn')}
                             </p>
-                            <p className="text-sm text-slate-400 mt-1">{t('browse_hint')}</p>
+                            {!selectedFileName && <p className="text-[10px] text-slate-400 mt-0.5">{t('browse_hint')}</p>}
                         </div>
                     </div>
+
+                    {/* Thumbnail Preview Area */}
+                    {imageItems.length > 0 && (
+                        <div className="flex gap-3 overflow-x-auto py-3 px-1 scrollbar-hide">
+                            {imageItems.map((item) => (
+                                <ThumbnailItem
+                                    key={item.id}
+                                    item={item}
+                                    onCountChange={(count) => onItemCountChange(item.id, count)}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Grid Settings */}
@@ -177,6 +198,47 @@ export function ControlPanel({
                 </motion.button>
             </div>
         </aside>
+    );
+}
+
+/**
+ * Local helper for rendering individual image thumbnails with lifecycle management
+ */
+function ThumbnailItem({ item, onCountChange }: { item: ImageItem; onCountChange: (count: number) => void }) {
+    const [url, setUrl] = useState<string>("");
+
+    useEffect(() => {
+        const u = URL.createObjectURL(item.file);
+        setUrl(u);
+        return () => URL.revokeObjectURL(u);
+    }, [item.file]);
+
+    const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = parseInt(e.target.value) || 1;
+        onCountChange(Math.max(1, Math.min(999, val)));
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex-shrink-0 w-16 h-16 rounded-lg border border-slate-200 bg-white shadow-sm relative group transition-all hover:border-brand-primary"
+            title={item.file.name}
+        >
+            {url && <img src={url} alt="" className="w-full h-full object-contain p-1" />}
+
+            {/* Count Input Overlay */}
+            <div className="absolute -bottom-1 -right-1 flex items-center bg-brand-primary rounded-md shadow-sm border border-white shadow-brand-primary/20">
+                <input
+                    type="number"
+                    min="1"
+                    max="999"
+                    value={item.count}
+                    onChange={handleCountChange}
+                    className="w-10 h-6 bg-transparent text-white text-[10px] font-bold text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+            </div>
+        </motion.div>
     );
 }
 

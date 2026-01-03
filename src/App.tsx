@@ -17,17 +17,22 @@ const DEFAULT_CONFIG: HelperLayoutConfig = {
   orientation: 'landscape',
 };
 
+export interface ImageItem {
+  id: string;
+  file: File;
+  count: number;
+}
+
 function App() {
-  const { t } = useI18n(); // Helper to access translations if needed, though most UI in subcomponents
+  const { t } = useI18n();
 
   // State
   const [config, setConfig] = useState<HelperLayoutConfig>(() => {
-    // Load from localStorage
     const saved = localStorage.getItem("label_printer_config");
     return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
   });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageItems, setImageItems] = useState<ImageItem[]>([]);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
 
   // Toast State
@@ -55,15 +60,49 @@ function App() {
     setConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const handleFileSelect = (file: File) => {
-    setImageFile(file);
-    setSelectedFileName(file.name);
+  const handleFilesSelect = (files: File[]) => {
+    const totalSlots = config.rows * config.cols;
+    const numFiles = files.length;
+
+    const newItems: ImageItem[] = files.map((file, idx) => {
+      let initialCount = 1;
+
+      if (numFiles > 1) {
+        // 多图模式：平分格子，最后一份拿余数
+        const baseCount = Math.floor(totalSlots / numFiles);
+        initialCount = (idx === numFiles - 1)
+          ? totalSlots - (baseCount * (numFiles - 1))
+          : baseCount;
+
+        // 兜底：如果格子太少导致算出来是0，至少给1
+        if (initialCount <= 0) initialCount = 1;
+      }
+
+      return {
+        id: Math.random().toString(36).substring(2, 9),
+        file,
+        count: initialCount
+      };
+    });
+
+    setImageItems(newItems);
+    if (files.length === 1) {
+      setSelectedFileName(files[0].name);
+    } else if (files.length > 1) {
+      setSelectedFileName(`${files.length} images selected`);
+    } else {
+      setSelectedFileName("");
+    }
+  };
+
+  const handleItemCountChange = (id: string, count: number) => {
+    setImageItems(prev => prev.map(item => item.id === id ? { ...item, count } : item));
   };
 
   const handleGenerateValues = async () => {
-    if (!imageFile) return;
+    if (imageItems.length === 0) return;
     try {
-      await generatePDF(config, imageFile);
+      await generatePDF(config, imageItems);
       showToast(t('gen_success'), 'success');
     } catch (e) {
       showToast(t('gen_failed') + ": " + (e as Error).message, 'error');
@@ -77,13 +116,15 @@ function App() {
         <ControlPanel
           config={config}
           onConfigChange={handleConfigChange}
-          onFileSelect={handleFileSelect}
+          onFilesSelect={handleFilesSelect}
+          imageItems={imageItems}
+          onItemCountChange={handleItemCountChange}
           selectedFileName={selectedFileName}
           onGeneratePdf={handleGenerateValues}
         />
         <PreviewPanel
           config={config}
-          imageFile={imageFile}
+          imageItems={imageItems}
         />
       </main>
 

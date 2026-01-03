@@ -1,20 +1,27 @@
 import jsPDF from "jspdf";
 import { calculateLabelLayout } from "./layoutMath";
 import type { HelperLayoutConfig } from "./layoutMath";
+import type { ImageItem } from "../App";
 
-export async function generatePDF(config: HelperLayoutConfig, imageFile: File): Promise<void> {
+export async function generatePDF(config: HelperLayoutConfig, imageItems: ImageItem[]): Promise<void> {
     // 1. Calculate Layout
     const layout = calculateLabelLayout(config);
     if (layout.error) {
         throw new Error(layout.error);
     }
 
-    // 2. Load Image to get format/data
-    const imageData = await fileToDataURL(imageFile);
-    const { format, width: imgWidth, height: imgHeight } = await getImageProperties(imageData);
+    // 2. Load all images with their settings
+    const loadedImages = await Promise.all(imageItems.map(async (item) => {
+        const data = await fileToDataURL(item.file);
+        const props = await getImageProperties(data);
+        return { ...item, data, ...props };
+    }));
+
+    if (loadedImages.length === 0) {
+        throw new Error("No images provided");
+    }
 
     // 3. Create PDF
-    // jsPDF default unit is mm, which matches our calculation
     const pdf = new jsPDF({
         orientation: config.orientation,
         unit: "mm",
@@ -22,27 +29,46 @@ export async function generatePDF(config: HelperLayoutConfig, imageFile: File): 
     });
 
     // 4. Draw Images
-    // We use the positions from our layout math
-    layout.positions.forEach(pos => {
-        // Calculate aspect ratio fit (Contain)
-        const scale = Math.min(pos.width / imgWidth, pos.height / imgHeight);
+    layout.positions.forEach((pos, idx) => {
+        let img = null;
 
-        const w = imgWidth * scale; // Rendered width
-        const h = imgHeight * scale; // Rendered height
+        if (loadedImages.length === 1) {
+            // 单图模式：铺满全页
+            img = loadedImages[0];
+        } else if (loadedImages.length > 1) {
+            // 多图模式：精确分配
+            let accumulated = 0;
+            for (const candidate of loadedImages) {
+                const start = accumulated;
+                accumulated += candidate.count;
+                if (idx >= start && idx < accumulated) {
+                    img = candidate;
+                    break;
+                }
+            }
+        }
+
+        if (!img) return;
+
+        // Calculate aspect ratio fit (Contain)
+        const scale = Math.min(pos.width / img.width, pos.height / img.height);
+
+        const w = img.width * scale;
+        const h = img.height * scale;
 
         // Center the image in the slot
         const x = pos.x + (pos.width - w) / 2;
         const y = pos.y + (pos.height - h) / 2;
 
         pdf.addImage(
-            imageData,
-            format,
+            img.data,
+            img.format,
             x,
             y,
             w,
             h,
             undefined,
-            'FAST' // Compression
+            'FAST'
         );
     });
 

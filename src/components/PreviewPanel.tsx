@@ -6,16 +6,18 @@ import { useI18n } from "../utils/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { mapPctToScale, getThumbBottomPct } from "../utils/zoomMath";
 
+import type { ImageItem } from "../App";
+
 interface PreviewPanelProps {
     config: HelperLayoutConfig;
-    imageFile: File | null;
+    imageItems: ImageItem[];
 }
 
-export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
+export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
     const { t } = useI18n();
     const [scale, setScale] = useState(1);
     const [baseFitScale, setBaseFitScale] = useState(0.8);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Zoom control states
@@ -50,15 +52,20 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
         return () => window.removeEventListener('resize', updateFitScale);
     }, [config.orientation]);
 
-    // 处理图片 URL 生命周期
+    // 处理图片 URL 列表生命周期
     useEffect(() => {
-        if (imageFile) {
-            const url = URL.createObjectURL(imageFile);
-            setImageUrl(url);
-            return () => URL.revokeObjectURL(url);
+        if (imageItems && imageItems.length > 0) {
+            const newMap = new Map<string, string>();
+            imageItems.forEach(item => {
+                newMap.set(item.id, URL.createObjectURL(item.file));
+            });
+            setImageUrls(newMap);
+            return () => {
+                newMap.forEach(url => URL.revokeObjectURL(url));
+            };
         }
-        setImageUrl(null);
-    }, [imageFile]);
+        setImageUrls(new Map());
+    }, [imageItems]);
 
     const layout = useMemo(() => calculateLabelLayout(config), [config]);
 
@@ -119,24 +126,44 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                             className="bg-white absolute top-0 left-0"
                             style={{ transformOrigin: 'top left' }}
                         >
-                            {layout.positions.map((pos, idx) => (
-                                <div
-                                    key={idx}
-                                    className="absolute overflow-hidden flex items-center justify-center bg-white border border-slate-200 border-dashed"
-                                    style={{
-                                        left: `${pos.x}mm`,
-                                        top: `${pos.y}mm`,
-                                        width: `${pos.width}mm`,
-                                        height: `${pos.height}mm`,
-                                    }}
-                                >
-                                    {imageUrl ? (
-                                        <img src={imageUrl} className="w-full h-full object-contain" alt="" />
-                                    ) : (
-                                        <span className="text-[12px] text-slate-400 font-medium select-none">Label {idx + 1}</span>
-                                    )}
-                                </div>
-                            ))}
+                            {layout.positions.map((pos, idx) => {
+                                let currentImageUrl = null;
+
+                                if (imageItems.length === 1) {
+                                    // 单图模式：铺满全页 (物理直觉：一张图默认就是刷墙)
+                                    currentImageUrl = imageUrls.get(imageItems[0].id);
+                                } else if (imageItems.length > 1) {
+                                    // 多图模式：精确计数 (物理直觉：每张选了几张就贴几张)
+                                    let accumulated = 0;
+                                    for (const item of imageItems) {
+                                        const start = accumulated;
+                                        accumulated += item.count;
+                                        if (idx >= start && idx < accumulated) {
+                                            currentImageUrl = imageUrls.get(item.id);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="absolute overflow-hidden flex items-center justify-center bg-white border border-slate-200 border-dashed"
+                                        style={{
+                                            left: `${pos.x}mm`,
+                                            top: `${pos.y}mm`,
+                                            width: `${pos.width}mm`,
+                                            height: `${pos.height}mm`,
+                                        }}
+                                    >
+                                        {currentImageUrl ? (
+                                            <img src={currentImageUrl} className="w-full h-full object-contain" alt="" />
+                                        ) : (
+                                            <span className="text-[12px] text-slate-400 font-medium select-none">Label {idx + 1}</span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </motion.div>
                     </div>
                 </div>
