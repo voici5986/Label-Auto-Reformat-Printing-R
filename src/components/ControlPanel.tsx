@@ -1,9 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
-import { UploadCloud, Grid, Layout, File as FileIcon, FileMinus, Download, CheckCircle, AlertCircle } from "lucide-react";
+import { UploadCloud, Grid, Layout, File as FileIcon, FileMinus } from "lucide-react";
 import type { HelperLayoutConfig } from "../utils/layoutMath";
-import { motion, Reorder, AnimatePresence } from "framer-motion";
+import { motion, Reorder } from "framer-motion";
 import { useI18n } from "../utils/i18n";
 import { NumberInput } from "./NumberInput";
+import { SmartButton } from "./SmartButton";
+import { ThumbnailItem } from "./ThumbnailItem";
+import { useMemo } from "react";
 
 import type { ImageItem } from "../App";
 
@@ -93,7 +95,7 @@ export function ControlPanel({
                                 <Reorder.Item
                                     key={item.id}
                                     value={item}
-                                    dragListener={true} // Enable dragging on the item itself
+                                    dragListener={true}
                                 >
                                     <ThumbnailItem
                                         item={item}
@@ -128,7 +130,6 @@ export function ControlPanel({
                         />
                     </div>
 
-                    {/* Range Sliders -> Now Number Inputs */}
                     <div className="grid grid-cols-2 gap-4">
                         <NumberInput
                             label={`${t('margin')} (mm)`}
@@ -188,162 +189,13 @@ export function ControlPanel({
 
             {/* Action Button */}
             <div className="p-6 border-t border-glass-border bg-white/40 backdrop-blur-sm rounded-b-xl overflow-hidden relative">
-                {/* Shine effect container */}
-                <motion.div
-                    className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                    initial={false}
-                    animate={selectedFileName ? { x: "100%" } : { x: "-100%" }}
-                    transition={{ duration: 0.5 }}
-                />
-
-                <motion.button
-                    layout
-                    whileHover={selectedFileName && genStatus === 'idle' ? { scale: 1.02, boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.4)" } : {}}
-                    whileTap={selectedFileName && genStatus === 'idle' ? { scale: 0.98 } : {}}
-                    initial={false}
-                    animate={
-                        (selectedFileName && genStatus === 'idle') || genStatus === 'success' || genStatus === 'error' ? {
-                            opacity: 1,
-                            scale: 1,
-                            filter: "grayscale(0%)",
-                            boxShadow: genStatus === 'success'
-                                ? "0 10px 25px -5px rgba(34, 197, 94, 0.4)"
-                                : genStatus === 'error'
-                                    ? "0 10px 25px -5px rgba(239, 68, 68, 0.4)"
-                                    : "0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06)"
-                        } : {
-                            opacity: 0.7,
-                            scale: 1,
-                            filter: "grayscale(100%)",
-                            boxShadow: "none"
-                        }
-                    }
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                <SmartButton
                     onClick={onGeneratePdf}
-                    disabled={!selectedFileName || genStatus !== 'idle'}
-                    className={`w-full py-3.5 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 relative overflow-hidden group transition-colors duration-300
-                        ${genStatus === 'success'
-                            ? 'bg-green-500 text-white'
-                            : genStatus === 'error'
-                                ? 'bg-red-500 text-white'
-                                : selectedFileName && genStatus === 'idle'
-                                    ? 'bg-gradient-to-r from-brand-primary to-brand-secondary text-white'
-                                    : genStatus === 'generating'
-                                        ? 'bg-slate-100 text-slate-400 border border-slate-200'
-                                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
-                >
-                    {/* Progress Background */}
-                    {genStatus === 'generating' && (
-                        <motion.div
-                            className="absolute inset-0 bg-brand-primary/10 origin-left"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: genProgress / 100 }}
-                            transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-                        />
-                    )}
-
-                    <AnimatePresence mode="wait">
-                        {genStatus === 'generating' ? (
-                            <motion.div
-                                key="generating"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="flex items-center gap-2 relative z-10"
-                            >
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                >
-                                    <Download className="w-5 h-5" />
-                                </motion.div>
-                                <span>{genProgress}%...</span>
-                            </motion.div>
-                        ) : genStatus === 'success' ? (
-                            <motion.div
-                                key="success"
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
-                                className="flex items-center gap-2 relative z-10"
-                            >
-                                <CheckCircle className="w-5 h-5" />
-                                <span>{t('gen_success').split('!')[0]}!</span>
-                            </motion.div>
-                        ) : genStatus === 'error' ? (
-                            <motion.div
-                                key="error"
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
-                                className="flex items-center gap-2 relative z-10"
-                            >
-                                <AlertCircle className="w-5 h-5" />
-                                <span>{t('gen_failed')}</span>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="idle"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="flex items-center gap-2 relative z-10"
-                            >
-                                <Download className="w-5 h-5" />
-                                <span>{t('generate_btn')}</span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.button>
+                    disabled={!selectedFileName}
+                    genStatus={genStatus}
+                    genProgress={genProgress}
+                />
             </div>
         </aside>
-    );
-}
-
-/**
- * Local helper for rendering individual image thumbnails with lifecycle management
- */
-function ThumbnailItem({ item, onCountChange }: { item: ImageItem; onCountChange: (count: number) => void }) {
-    const [url, setUrl] = useState<string>("");
-
-    useEffect(() => {
-        const u = URL.createObjectURL(item.file);
-        setUrl(u);
-        return () => URL.revokeObjectURL(u);
-    }, [item.file]);
-
-    const handleCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = parseInt(e.target.value) || 1;
-        onCountChange(Math.max(1, Math.min(999, val)));
-    };
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex-shrink-0 w-20 h-20 rounded-lg border border-slate-200 bg-white shadow-sm relative group transition-all hover:border-brand-primary"
-            title={item.file.name}
-        >
-            {url && (
-                <img
-                    src={url}
-                    alt=""
-                    className="w-full h-full object-contain p-1 pointer-events-none"
-                    draggable="false"
-                />
-            )}
-
-            {/* Count Input Overlay */}
-            <div className="absolute -bottom-1 -right-1 flex items-center bg-brand-primary rounded-md shadow-sm border border-white shadow-brand-primary/20">
-                <input
-                    type="number"
-                    min="1"
-                    max="99"
-                    value={item.count}
-                    onChange={handleCountChange}
-                    className="w-6 h-4 bg-transparent text-white text-[14px] font-bold text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-            </div>
-        </motion.div>
     );
 }

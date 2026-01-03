@@ -119,6 +119,7 @@ function App() {
     setImageItems(prev => prev.map(item => item.id === id ? { ...item, count } : item));
   };
 
+
   const handleGenerateValues = async () => {
     if (imageItems.length === 0) return;
     setGenStatus('generating');
