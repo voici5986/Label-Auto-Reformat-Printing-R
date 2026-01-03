@@ -112,3 +112,25 @@ export function calculateLabelLayout(config: HelperLayoutConfig): {
     pageHeight
   };
 }
+
+/**
+ * Resolves which item should be placed in a specific grid slot based on counts.
+ * This is a generic function used by both Preview and PDF generator.
+ */
+export function resolveItemAtSlot<T extends { count: number }>(
+  idx: number,
+  items: T[]
+): T | null {
+  if (items.length === 0) return null;
+
+  let accumulated = 0;
+  for (const item of items) {
+    const start = accumulated;
+    accumulated += item.count;
+    if (idx >= start && idx < accumulated) {
+      return item;
+    }
+  }
+
+  return null;
+}

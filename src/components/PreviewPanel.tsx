@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { calculateLabelLayout, A4_WIDTH_MM, A4_HEIGHT_MM } from "../utils/layoutMath";
+import { calculateLabelLayout, A4_WIDTH_MM, A4_HEIGHT_MM, resolveItemAtSlot } from "../utils/layoutMath";
 import type { HelperLayoutConfig } from "../utils/layoutMath";
 import { Maximize } from "lucide-react";
 import { useI18n } from "../utils/i18n";
@@ -23,6 +23,8 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
     // Zoom control states
     const [isDragging, setIsDragging] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [isPanning, setIsPanning] = useState(false);
+    const [panStart, setPanStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
     const sliderTrackRef = useRef<HTMLDivElement>(null);
 
     // 计算自动缩放比例 (保持在本地，因为依赖 DOM ref)
@@ -97,6 +99,42 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
         };
     }, [isDragging]);
 
+    // Panning (Drag-to-scroll) Handlers
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (!containerRef.current || e.button !== 0) return; // Only left click
+        e.preventDefault(); // Stop native drag and drop behavior
+        setIsPanning(true);
+        setPanStart({
+            x: e.clientX,
+            y: e.clientY,
+            scrollLeft: containerRef.current.scrollLeft,
+            scrollTop: containerRef.current.scrollTop
+        });
+    };
+
+    useEffect(() => {
+        if (!isPanning || !containerRef.current) return;
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!containerRef.current) return;
+            const dx = e.clientX - panStart.x;
+            const dy = e.clientY - panStart.y;
+            containerRef.current.scrollLeft = panStart.scrollLeft - dx;
+            containerRef.current.scrollTop = panStart.scrollTop - dy;
+        };
+
+        const handleMouseUp = () => {
+            setIsPanning(false);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isPanning, panStart]);
+
     return (
         <section className="flex-1 flex flex-col p-2 pl-0 h-full overflow-hidden">
             <div className="flex-1 bg-glass-surface/40 backdrop-blur-glass rounded-lg border border-glass-border/60 flex flex-col relative overflow-hidden shadow-inner font-sans">
@@ -105,7 +143,11 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
                 <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
                 {/* Scrollable Area */}
-                <div ref={containerRef} className="flex-1 overflow-auto text-center p-2 scrollbar-thin scrollbar-thumb-slate-300">
+                <div
+                    ref={containerRef}
+                    onMouseDown={handleMouseDown}
+                    className={`flex-1 overflow-auto text-center p-2 scrollbar-thin scrollbar-thumb-slate-300 select-none ${isPanning ? 'cursor-grabbing' : 'cursor-grab'}`}
+                >
                     <div className="inline-block text-left align-top" style={{
                         width: `${paperWidthMm * scale * baseFitScale}mm`,
                         height: `${paperHeightMm * scale * baseFitScale}mm`,
@@ -127,18 +169,9 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
                             style={{ transformOrigin: 'top left' }}
                         >
                             {layout.positions.map((pos, idx) => {
-                                let currentImageUrl = null;
-
                                 // 无论是单图还是多图，统一使用“精确计数”逻辑
-                                let accumulated = 0;
-                                for (const item of imageItems) {
-                                    const start = accumulated;
-                                    accumulated += item.count;
-                                    if (idx >= start && idx < accumulated) {
-                                        currentImageUrl = imageUrls.get(item.id);
-                                        break;
-                                    }
-                                }
+                                const item = resolveItemAtSlot(idx, imageItems);
+                                const currentImageUrl = item ? imageUrls.get(item.id) : null;
 
                                 return (
                                     <div
@@ -152,7 +185,12 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
                                         }}
                                     >
                                         {currentImageUrl ? (
-                                            <img src={currentImageUrl} className="w-full h-full object-contain" alt="" />
+                                            <img
+                                                src={currentImageUrl}
+                                                className="w-full h-full object-contain pointer-events-none"
+                                                alt=""
+                                                draggable="false"
+                                            />
                                         ) : (
                                             <span className="text-[12px] text-slate-400 font-medium select-none">Label {idx + 1}</span>
                                         )}

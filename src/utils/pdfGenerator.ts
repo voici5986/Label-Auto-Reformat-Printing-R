@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { calculateLabelLayout } from "./layoutMath";
+import { calculateLabelLayout, resolveItemAtSlot } from "./layoutMath";
 import type { HelperLayoutConfig } from "./layoutMath";
 import type { ImageItem } from "../App";
 
@@ -30,18 +30,8 @@ export async function generatePDF(config: HelperLayoutConfig, imageItems: ImageI
 
     // 4. Draw Images
     layout.positions.forEach((pos, idx) => {
-        let img = null;
-
         // 统一使用“精确分配”逻辑
-        let accumulated = 0;
-        for (const candidate of loadedImages) {
-            const start = accumulated;
-            accumulated += candidate.count;
-            if (idx >= start && idx < accumulated) {
-                img = candidate;
-                break;
-            }
-        }
+        const img = resolveItemAtSlot(idx, loadedImages);
 
         if (!img) return;
 

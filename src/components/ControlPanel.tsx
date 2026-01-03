@@ -35,8 +35,8 @@ export function ControlPanel({
     };
 
     return (
-        <aside className="w-80 bg-glass-surface backdrop-blur-glass border border-glass-border border-r-0 flex flex-col z-10 m-2 rounded-lg shadow-sm">
-            <div className="p-6 overflow-y-auto flex-1 space-y-8 scrollbar-hide">
+        <aside className="w-80 bg-glass-surface backdrop-blur-glass border border-glass-border border-r-0 flex flex-col z-10 m-2 rounded-xl shadow-lg">
+            <div className="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-hide">
 
                 {/* File Selection */}
                 <div className="space-y-3">
@@ -53,9 +53,9 @@ export function ControlPanel({
                             className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
                         />
                         <div className={`absolute inset-0 bg-indigo-50/50 rounded-lg border-2 border-dashed transition-colors ${selectedFileName ? 'border-brand-primary bg-indigo-50' : 'border-indigo-200 group-hover:border-indigo-400'}`}></div>
-                        <div className="relative flex flex-row items-center gap-0 py-3 px-5 text-left pointer-events-none">
+                        <div className="relative flex flex-row items-center gap-3 py-3 px-4 pointer-events-none">
                             <div className="bg-white p-2 rounded-full shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                                <UploadCloud className={`w-7 h-7 ${selectedFileName ? 'text-brand-primary' : 'text-indigo-400'}`} />
+                                <UploadCloud className={`w-6 h-6 ${selectedFileName ? 'text-brand-primary' : 'text-indigo-400'}`} />
                             </div>
                             <div className="flex-1 min-w-0 flex flex-col items-center">
                                 <p className="text-sm font-bold text-slate-700 truncate w-full text-center">
@@ -162,7 +162,7 @@ export function ControlPanel({
             </div>
 
             {/* Action Button */}
-            <div className="p-6 border-t border-white/50 bg-white/40 backdrop-blur-sm rounded-lg overflow-hidden relative">
+            <div className="p-6 border-t border-glass-border bg-white/40 backdrop-blur-sm rounded-b-xl overflow-hidden relative">
                 {/* Shine effect container */}
                 <motion.div
                     className="absolute top-0 left-0 w-full h-full pointer-events-none"
