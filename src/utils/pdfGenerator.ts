@@ -28,9 +28,16 @@ export async function generatePDF(
                 const url = URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
-                const dateStr = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "");
+                const now = new Date();
+                const YY = String(now.getFullYear()).slice(-2);
+                const MM = String(now.getMonth() + 1).padStart(2, '0');
+                const DD = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const dateStr = `label_${YY}${MM}${DD}_${hh}${mm}`;
+
                 link.href = url;
-                link.download = `labelpilot_${dateStr}.pdf`;
+                link.download = `${dateStr}.pdf`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
