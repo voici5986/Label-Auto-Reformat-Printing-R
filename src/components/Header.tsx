@@ -13,7 +13,7 @@ export function Header() {
         <motion.header
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="h-10 bg-glass-surface backdrop-blur-glass border-b border-glass-border z-20 px-6 flex items-center justify-between shrink-0 shadow-sm"
+            className="h-10 glass-panel border-x-0 border-t-0 rounded-none z-20 px-6 flex items-center justify-between shrink-0 shadow-sm"
         >
             <div className="flex items-center gap-3">
                 <div className="bg-brand-primary text-white p-1 rounded-lg shadow-lg shadow-brand-primary/30">

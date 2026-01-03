@@ -2,15 +2,21 @@
 
 @theme {
   --font-sans: 'Inter', 'sans-serif';
-  
+
   /* Brand Colors */
   --color-brand-primary: var(--color-indigo-600);
   --color-brand-secondary: var(--color-blue-500);
-  
+
   /* Surface / Glassmorphism */
   --color-glass-surface: color-mix(in srgb, white 80%, transparent);
   --color-glass-border: color-mix(in srgb, white 50%, transparent);
   --blur-glass: 12px;
+}
+
+@utility glass-panel {
+  background-color: var(--color-glass-surface);
+  backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--color-glass-border);
 }
 
 @layer base {

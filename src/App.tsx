@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "./components/Layout";
 import { Header } from "./components/Header";
 import { ControlPanel } from "./components/ControlPanel";
@@ -34,12 +34,6 @@ function App() {
 
   const [imageItems, setImageItems] = useState<ImageItem[]>([]);
 
-  // 响应式派生：根据语言和图片数量自动计算显示文本
-  const selectedFileName = useMemo(() => {
-    if (imageItems.length === 0) return "";
-    if (imageItems.length === 1) return imageItems[0].file.name;
-    return t('files_selected', { n: imageItems.length });
-  }, [imageItems, t]);
 
   // Toast State
   const [toast, setToast] = useState<{ message: string; type: ToastType; visible: boolean }>({
@@ -152,7 +146,6 @@ function App() {
           imageItems={imageItems}
           onReorder={setImageItems}
           onItemCountChange={handleItemCountChange}
-          selectedFileName={selectedFileName}
           onGeneratePdf={handleGenerateValues}
           genStatus={genStatus}
           genProgress={genProgress}

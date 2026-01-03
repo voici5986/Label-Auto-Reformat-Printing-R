@@ -137,7 +137,7 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
 
     return (
         <section className="flex-1 flex flex-col p-2 pl-0 h-full overflow-hidden">
-            <div className="flex-1 bg-glass-surface/40 backdrop-blur-glass rounded-lg border border-glass-border/60 flex flex-col relative overflow-hidden shadow-inner font-sans">
+            <div className="flex-1 glass-panel rounded-lg flex flex-col relative overflow-hidden shadow-inner font-sans">
 
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>

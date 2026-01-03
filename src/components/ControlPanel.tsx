@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { UploadCloud, Grid, Layout, File as FileIcon, FileMinus, Download, CheckCircle, AlertCircle } from "lucide-react";
 import type { HelperLayoutConfig } from "../utils/layoutMath";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
@@ -14,7 +14,6 @@ interface ControlPanelProps {
     imageItems: ImageItem[];
     onReorder: (newItems: ImageItem[]) => void;
     onItemCountChange: (id: string, count: number) => void;
-    selectedFileName?: string;
     onGeneratePdf: () => void;
     genStatus?: 'idle' | 'generating' | 'success' | 'error';
     genProgress?: number;
@@ -29,7 +28,6 @@ export function ControlPanel({
     imageItems,
     onReorder,
     onItemCountChange,
-    selectedFileName,
     onGeneratePdf,
     genStatus = 'idle',
     genProgress = 0,
@@ -38,6 +36,13 @@ export function ControlPanel({
 }: ControlPanelProps) {
     const { t } = useI18n();
 
+    // 局部化逻辑：计算显示的文件名或数量
+    const selectedFileName = useMemo(() => {
+        if (imageItems.length === 0) return "";
+        if (imageItems.length === 1) return imageItems[0].file.name;
+        return t('files_selected', { n: imageItems.length });
+    }, [imageItems, t]);
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             onFilesSelect(Array.from(e.target.files));
@@ -45,7 +50,7 @@ export function ControlPanel({
     };
 
     return (
-        <aside className="w-80 bg-glass-surface backdrop-blur-glass border border-glass-border border-r-0 flex flex-col z-10 m-2 rounded-xl shadow-lg">
+        <aside className="w-80 glass-panel border-r-0 flex flex-col z-10 m-2 rounded-xl shadow-lg">
             <div className="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-hide">
 
                 {/* File Selection */}
