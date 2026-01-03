@@ -11,59 +11,41 @@
 
 ## ✨ 核心特性
 
-- **🚀 纯客户端运行**: 使用 `jspdf` 直接在浏览器中生成可打印的 A4 PDF。所有数据都在本地处理，不上传到任何服务器。
-- **🎨 现代 UX 设计**: 基于 Tailwind CSS v4 和 Framer Motion 动画的玻璃拟态设计风格。
-- **🌍 国际化支持**: 内置 **英语** 和 **中文** 支持，可一键实时切换。
-- **👁️ 实时预览**: 所见即所得。在生成之前，可以在虚拟 A4 画布上可视化查看排版效果。
-- **📐 灵活排版**:
-  - 主要参数：自定义行数和列数（默认 3x3）
-  - 精确控制：可调整边距和间距（毫米级精度）
-  - 纸张支持：支持纵向和横向排版
-- **🖼️ 智能缩放**: 自动缩放并居中图片以适应标签插槽，同时保持原始比例（无拉伸变形）。
+- **⚡ 极致性能**: 利用 **Web Worker** 实现异步生成。即使处理上百张高分辨率图片，UI 依然流畅且无响应阻塞。
+- **🎨 智感按钮反馈**: 将进度追踪和成功/错误状态直接集成在操作按钮中，彻底告别侵入性的全屏遮罩层。
+- **📐 动态网格限制**: 行列上限会根据纸张方向（纵向 vs 横向）自动调整并实时修正。
+- **🌍 国际化支持**: 内置 **中/英文** 实时切换，所有提示与状态信息均已完美适配。
+- **👁️ 实时预览**: 所见即所得。基于 A4 画布的精准视觉预览。
 
 ## 🛠️ 技术栈
 
-- **框架**: React 19.2.3 (最新稳定版)
+- **框架**: React 19.2.3
 - **构建工具**: Vite 7.3
-- **语言**: TypeScript
-- **样式**: Tailwind CSS 4.1, Lucide React (图标库)
+- **并行计算**: Web Workers (ES Module)
 - **PDF 引擎**: jsPDF
-- **动画**: Framer Motion
+- **样式与动画**: Tailwind CSS 4.1, Framer Motion
 
 ## 🚀 快速开始
 
-### 前置要求
-
-- Node.js (推荐 v18 或更高版本)
-
 ### 安装步骤
+1. `npm install`
+2. `npm run dev`
 
-1. 克隆仓库:
-   ```bash
-   git clone https://github.com/your-username/label-react.git
-   cd label-react
-   ```
-
-2. 安装依赖:
-   ```bash
-   npm install
-   ```
-
-3. 启动开发服务器:
-   ```bash
-   npm run dev
-   ```
-   在浏览器中打开 `http://localhost:5173`。
+### 部署到 Vercel
+本项目专为 Vercel 优化，支持零配置部署：
+1. Fork 本仓库到您的 GitHub 账号。
+2. 在 Vercel 中导入该仓库。
+3. 确认以下设置（通常会自动识别）：
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. 点击 **Deploy** 即可。
 
 ## 📦 生产环境构建
-
-构建用于生产环境的静态文件:
-
 ```bash
 npm run build
 ```
-
-构建产物将位于 `dist/` 目录中。您可以将这些文件部署到任何静态托管服务（如 Vercel, Netlify, GitHub Pages 或 Nginx）。
+生成的文件位于 `dist/` 目录中。
 
 ## 💡 使用指南
 

@@ -11,59 +11,41 @@ A modern, offline-capable web application for batch generating label PDF documen
 
 ## ✨ Key Features
 
-- **🚀 Pure Client-Side**: Generates print-ready A4 PDFs directly in your browser using `jspdf`. No data is uploaded to any server.
-- **🎨 Modern UX**: Glassmorphism design system powered by Tailwind CSS v4 and Framer Motion animations.
+- **⚡ High Performance**: Powered by **Web Workers**, PDF generation is asynchronous and non-blocking, ensuring the UI remains responsive even with 100+ high-res images.
+- **🎨 Smart Button Feedback**: Integrated progress tracking and success/error status directly within the action button. No more intrusive full-screen overlays.
+- **📐 Dynamic Constraints**: Grid limits (rows/cols) automatically adjust based on page orientation (Portrait vs Landscape).
 - **🌍 Internationalization**: Built-in support for **English** and **Chinese**, with instant language switching.
-- **👁️ Real-time Preview**: What you see is what you get. Vizualize your layout on a virtual A4 canvas before generating.
-- **📐 Flexible Layout**:
-  - Customizable Rows & Columns (Default 3x3)
-  - Adjustable Margins & Spacing (mm precision)
-  - Portrait & Landscape orientation support
-- **🖼️ Smart Image Scaling**: Automatically scales and centers images to fit label slots without distortion (Aspect Ratio Preserved).
+- **👁️ Real-time Preview**: What you see is what you get with a virtual A4 canvas.
 
 ## 🛠️ Tech Stack
 
-- **Framework**: React 19.2.3 (Latest Stable)
+- **Framework**: React 19.2.3
 - **Build Tool**: Vite 7.3
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4.1, Lucide React (Icons)
+- **Multithreading**: Web Workers (ES Module)
 - **PDF Engine**: jsPDF
-- **Animation**: Framer Motion
+- **Styling**: Tailwind CSS 4.1, Framer Motion
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or higher recommended)
-
 ### Installation
+1. `npm install`
+2. `npm run dev`
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/label-react.git
-   cd label-react
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:5173` in your browser.
+### Deployment to Vercel
+This project is optimized for Vercel. 
+1. Fork this repository to your own GitHub account.
+2. Import the project in Vercel.
+3. Ensure the following settings are detected:
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Click **Deploy**.
 
 ## 📦 Building for Production
-
-To create a production-ready build (static files):
-
 ```bash
 npm run build
 ```
-
-The output will be in the `dist/` directory. You can drop these files into any static hosting service (Vercel, Netlify, GitHub Pages, or Nginx).
+The output will be in the `dist/` directory. 
 
 ## 💡 Usage Guide
 
