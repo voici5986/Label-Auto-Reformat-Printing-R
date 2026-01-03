@@ -4,6 +4,7 @@ import type { HelperLayoutConfig } from "../utils/layoutMath";
 import { Maximize } from "lucide-react";
 import { useI18n } from "../utils/i18n";
 import { motion, AnimatePresence } from "framer-motion";
+import { mapPctToScale, getThumbBottomPct } from "../utils/zoomMath";
 
 interface PreviewPanelProps {
     config: HelperLayoutConfig;
@@ -22,7 +23,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
     const [isHovered, setIsHovered] = useState(false);
     const sliderTrackRef = useRef<HTMLDivElement>(null);
 
-    // 计算自动缩放比例
+    // 计算自动缩放比例 (保持在本地，因为依赖 DOM ref)
     useEffect(() => {
         const updateFitScale = () => {
             if (!containerRef.current) return;
@@ -41,10 +42,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
             const paperW = paperWidthMm * mmToPx;
             const paperH = paperHeightMm * mmToPx;
 
-            const scaleW = containerW / paperW;
-            const scaleH = containerH / paperH;
-
-            setBaseFitScale(Math.min(scaleW, scaleH));
+            setBaseFitScale(Math.min(containerW / paperW, containerH / paperH));
         };
 
         updateFitScale();
@@ -52,14 +50,14 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
         return () => window.removeEventListener('resize', updateFitScale);
     }, [config.orientation]);
 
+    // 处理图片 URL 生命周期
     useEffect(() => {
         if (imageFile) {
             const url = URL.createObjectURL(imageFile);
             setImageUrl(url);
             return () => URL.revokeObjectURL(url);
-        } else {
-            setImageUrl(null);
         }
+        setImageUrl(null);
     }, [imageFile]);
 
     const layout = useMemo(() => calculateLabelLayout(config), [config]);
@@ -72,20 +70,8 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
         if (!sliderTrackRef.current) return;
         const rect = sliderTrackRef.current.getBoundingClientRect();
         const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
-
-        let pct = 1 - (clientY - rect.top) / rect.height;
-        pct = Math.max(0, Math.min(1, pct));
-
-        // 分段非线性映射: 100% (1.0) 位于中心 (0.5)
-        // 下平段: 0% -> 50% 进度 对应 50% -> 100% 缩放 (0.5 -> 1.0)
-        // 上平段: 50% -> 100% 进度 对应 100% -> 300% 缩放 (1.0 -> 3.0)
-        let newScale;
-        if (pct <= 0.5) {
-            newScale = 0.5 + (pct / 0.5) * 0.5;
-        } else {
-            newScale = 1.0 + ((pct - 0.5) / 0.5) * 2.0;
-        }
-        setScale(newScale);
+        const pct = 1 - (clientY - rect.top) / rect.height;
+        setScale(mapPctToScale(pct));
     };
 
     useEffect(() => {
@@ -104,20 +90,9 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
         };
     }, [isDragging]);
 
-    // 计算滑块位置的反向映射
-    const getThumbBottom = () => {
-        if (scale <= 1.0) {
-            // Scale 0.5 to 1.0 maps to bottom 0% to 50%
-            return ((scale - 0.5) / 0.5) * 50;
-        } else {
-            // Scale 1.0 to 3.0 maps to bottom 50% to 100%
-            return 50 + ((scale - 1.0) / 2.0) * 50;
-        }
-    };
-
     return (
         <section className="flex-1 flex flex-col p-2 pl-0 h-full overflow-hidden">
-            <div className="flex-1 bg-white/40 backdrop-blur-md rounded-lg border border-white/60 flex flex-col relative overflow-hidden shadow-inner font-sans">
+            <div className="flex-1 bg-glass-surface/40 backdrop-blur-glass rounded-lg border border-glass-border/60 flex flex-col relative overflow-hidden shadow-inner font-sans">
 
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -177,7 +152,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setScale(1)}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg text-slate-500 hover:text-indigo-600 transition-all shadow-sm border border-transparent hover:border-slate-200 bg-white/50"
+                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg text-slate-500 hover:text-brand-primary transition-all shadow-sm border border-transparent hover:border-slate-200 bg-white/50"
                         title={t('zoom_reset')}
                     >
                         <Maximize className="w-4 h-4" />
@@ -188,7 +163,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                             backgroundColor: isDragging ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.6)",
                             boxShadow: isDragging ? "0 4px 12px rgba(0,0,0,0.1)" : "0 4px 6px rgba(0,0,0,0.05)"
                         }}
-                        className="backdrop-blur-md rounded-lg p-1.5 border border-white/50 flex flex-col items-center h-40 w-8 relative"
+                        className="backdrop-blur-glass rounded-lg p-1.5 border border-glass-border flex flex-col items-center h-40 w-8 relative"
                     >
                         {/* Tooltip (Enhanced popup animation) */}
                         <AnimatePresence>
@@ -211,9 +186,9 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                             onTouchStart={(e) => { setIsDragging(true); handleSliderChange(e); }}
                         >
                             <motion.div
-                                className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-lg shadow-md pointer-events-none"
+                                className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-brand-primary rounded-lg shadow-md pointer-events-none"
                                 animate={{
-                                    bottom: `${getThumbBottom()}%`
+                                    bottom: `${getThumbBottomPct(scale)}%`
                                 }}
                                 transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
                                 style={{ marginBottom: '-8px' }}
