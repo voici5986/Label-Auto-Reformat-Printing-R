@@ -32,19 +32,14 @@ export async function generatePDF(config: HelperLayoutConfig, imageItems: ImageI
     layout.positions.forEach((pos, idx) => {
         let img = null;
 
-        if (loadedImages.length === 1) {
-            // 单图模式：铺满全页
-            img = loadedImages[0];
-        } else if (loadedImages.length > 1) {
-            // 多图模式：精确分配
-            let accumulated = 0;
-            for (const candidate of loadedImages) {
-                const start = accumulated;
-                accumulated += candidate.count;
-                if (idx >= start && idx < accumulated) {
-                    img = candidate;
-                    break;
-                }
+        // 统一使用“精确分配”逻辑
+        let accumulated = 0;
+        for (const candidate of loadedImages) {
+            const start = accumulated;
+            accumulated += candidate.count;
+            if (idx >= start && idx < accumulated) {
+                img = candidate;
+                break;
             }
         }
 

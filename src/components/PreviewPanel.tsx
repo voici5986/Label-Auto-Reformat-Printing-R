@@ -129,19 +129,14 @@ export function PreviewPanel({ config, imageItems }: PreviewPanelProps) {
                             {layout.positions.map((pos, idx) => {
                                 let currentImageUrl = null;
 
-                                if (imageItems.length === 1) {
-                                    // 单图模式：铺满全页 (物理直觉：一张图默认就是刷墙)
-                                    currentImageUrl = imageUrls.get(imageItems[0].id);
-                                } else if (imageItems.length > 1) {
-                                    // 多图模式：精确计数 (物理直觉：每张选了几张就贴几张)
-                                    let accumulated = 0;
-                                    for (const item of imageItems) {
-                                        const start = accumulated;
-                                        accumulated += item.count;
-                                        if (idx >= start && idx < accumulated) {
-                                            currentImageUrl = imageUrls.get(item.id);
-                                            break;
-                                        }
+                                // 无论是单图还是多图，统一使用“精确计数”逻辑
+                                let accumulated = 0;
+                                for (const item of imageItems) {
+                                    const start = accumulated;
+                                    accumulated += item.count;
+                                    if (idx >= start && idx < accumulated) {
+                                        currentImageUrl = imageUrls.get(item.id);
+                                        break;
                                     }
                                 }
 

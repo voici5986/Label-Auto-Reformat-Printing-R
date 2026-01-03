@@ -67,16 +67,19 @@ function App() {
     const newItems: ImageItem[] = files.map((file, idx) => {
       let initialCount = 1;
 
-      if (numFiles > 1) {
+      if (numFiles === 1) {
+        // 单图模式：初始填满全页
+        initialCount = totalSlots;
+      } else if (numFiles > 1) {
         // 多图模式：平分格子，最后一份拿余数
         const baseCount = Math.floor(totalSlots / numFiles);
         initialCount = (idx === numFiles - 1)
           ? totalSlots - (baseCount * (numFiles - 1))
           : baseCount;
-
-        // 兜底：如果格子太少导致算出来是0，至少给1
-        if (initialCount <= 0) initialCount = 1;
       }
+
+      // 兜底
+      if (initialCount <= 0) initialCount = 1;
 
       return {
         id: Math.random().toString(36).substring(2, 9),
