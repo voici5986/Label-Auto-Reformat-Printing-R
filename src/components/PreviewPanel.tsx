@@ -123,41 +123,47 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                 <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
 
                 {/* Scrollable Area */}
-                <div ref={containerRef} className="flex-1 overflow-auto flex flex-col items-center pb-6 px-4 scrollbar-thin scrollbar-thumb-slate-300">
-                    <motion.div
-                        initial={false}
-                        animate={{
-                            width: `${paperWidthMm}mm`,
-                            height: `${paperHeightMm}mm`,
-                            scale: scale * baseFitScale,
-                            // 动态阴影逻辑: 放大时阴影变淡弥散, 缩小时变深利落
-                            boxShadow: isDragging
-                                ? `0 ${20 / scale}px ${50 / scale}px -12px rgba(0,0,0,${0.1 + (1 - scale / 3) * 0.1})`
-                                : "0 20px 50px -12px rgba(0,0,0,0.15)"
-                        }}
-                        transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
-                        className="bg-white relative shrink-0"
-                        style={{ transformOrigin: 'top center', marginTop: '10px', originY: 0, originX: 0.5 }}
-                    >
-                        {layout.positions.map((pos, idx) => (
-                            <div
-                                key={idx}
-                                className="absolute overflow-hidden flex items-center justify-center bg-white border border-slate-200 border-dashed"
-                                style={{
-                                    left: `${pos.x}mm`,
-                                    top: `${pos.y}mm`,
-                                    width: `${pos.width}mm`,
-                                    height: `${pos.height}mm`,
-                                }}
-                            >
-                                {imageUrl ? (
-                                    <img src={imageUrl} className="w-full h-full object-contain" alt="" />
-                                ) : (
-                                    <span className="text-[12px] text-slate-400 font-medium select-none">Label {idx + 1}</span>
-                                )}
-                            </div>
-                        ))}
-                    </motion.div>
+                <div ref={containerRef} className="flex-1 overflow-auto text-center p-2 scrollbar-thin scrollbar-thumb-slate-300">
+                    <div className="inline-block text-left align-top" style={{
+                        width: `${paperWidthMm * scale * baseFitScale}mm`,
+                        height: `${paperHeightMm * scale * baseFitScale}mm`,
+                        marginTop: '0px',
+                        position: 'relative'
+                    }}>
+                        <motion.div
+                            initial={false}
+                            animate={{
+                                width: `${paperWidthMm}mm`,
+                                height: `${paperHeightMm}mm`,
+                                scale: scale * baseFitScale,
+                                boxShadow: isDragging
+                                    ? `0 ${20 / scale}px ${50 / scale}px -12px rgba(0,0,0,${0.1 + (1 - scale / 3) * 0.1})`
+                                    : "0 20px 50px -12px rgba(0,0,0,0.15)"
+                            }}
+                            transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
+                            className="bg-white absolute top-0 left-0"
+                            style={{ transformOrigin: 'top left' }}
+                        >
+                            {layout.positions.map((pos, idx) => (
+                                <div
+                                    key={idx}
+                                    className="absolute overflow-hidden flex items-center justify-center bg-white border border-slate-200 border-dashed"
+                                    style={{
+                                        left: `${pos.x}mm`,
+                                        top: `${pos.y}mm`,
+                                        width: `${pos.width}mm`,
+                                        height: `${pos.height}mm`,
+                                    }}
+                                >
+                                    {imageUrl ? (
+                                        <img src={imageUrl} className="w-full h-full object-contain" alt="" />
+                                    ) : (
+                                        <span className="text-[12px] text-slate-400 font-medium select-none">Label {idx + 1}</span>
+                                    )}
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* Vertical Zoom Controls */}
@@ -191,7 +197,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                                     initial={{ opacity: 0, x: -5, scale: 0.8 }}
                                     animate={{ opacity: 1, x: 0, scale: 1 }}
                                     exit={{ opacity: 0, x: -5, scale: 0.8 }}
-                                    className="absolute left-12 top-1/2 -translate-y-1/2 bg-slate-800 text-white text-[14px] px-2 py-1 rounded shadow-xl whitespace-nowrap pointer-events-none font-bold z-30 flex items-center gap-1.5"
+                                    className="absolute left-12 top-1/2 -translate-y-1/2 bg-slate-800 text-white text-[14px] px-2 py-1 rounded shadow-xl whitespace-nowrap pointer-events-none font-bold z-30"
                                 >
                                     {Math.round(scale * 100)}%
                                 </motion.div>
@@ -207,8 +213,7 @@ export function PreviewPanel({ config, imageFile }: PreviewPanelProps) {
                             <motion.div
                                 className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-lg shadow-md pointer-events-none"
                                 animate={{
-                                    bottom: `${getThumbBottom()}%`,
-                                    scale: Math.abs(scale - 1) < 0.01 ? 1.1 : 1
+                                    bottom: `${getThumbBottom()}%`
                                 }}
                                 transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
                                 style={{ marginBottom: '-8px' }}
